@@ -17,9 +17,9 @@ class VerificationCodesController extends Controller
 
         //发送验证码
         try {
-          $easySms->send($phone, [
-              'content' => "【Lbbs社区】您的验证码是{$code}。如非本人操作，请忽略本短信"
-          ]);
+//          $easySms->send($phone, [
+//              'content' => "【Lbbs社区】您的验证码是{$code}。如非本人操作，请忽略本短信"
+//          ]);
         } catch (\Overtrue\EasySms\Exceptions\NoGatewayAvailableException $exception) {
             $message = $exception->getException('yunpian')->getMessage();
             return $this->response->errorInternal($message ?: '短信发送失败');
