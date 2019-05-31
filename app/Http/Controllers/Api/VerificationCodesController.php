@@ -8,9 +8,20 @@ use Overtrue\EasySms\EasySms;
 
 class VerificationCodesController extends Controller
 {
-    public function store(VerificationCodeRequest $verificationCodeRequest, EasySms $easySms)
+    public function store(VerificationCodeRequest $request, EasySms $easySms)
     {
-        $phone = $verificationCodeRequest->phone;
+        $captchaData = \Cache::get($request->captcha_key);
+
+        if (!$captchaData) {
+            return $this->response->error('图片验证码已失效', 422);
+        }
+
+        if (!hash_equals($captchaData['code'], $request->captcha_code)) {
+            \Cache::forget($request->captcha_key);
+            return $this->response->errorUnauthorized('验证码错误');
+        }
+
+        $phone = $phone = $captchaData['phone'];
 
         //随机生成四位数
         $code = str_pad(random_int(1, 999999), 6, 0, STR_PAD_LEFT);
