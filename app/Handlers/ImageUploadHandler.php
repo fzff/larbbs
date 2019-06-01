@@ -26,7 +26,7 @@ class ImageUploadHandler
         $filename = $file_prefix . '_' . time() . '_' . str_random(10) . '.' . $extension;
 
         // 如果上传的不是图片将终止操作
-        if ( ! in_array($extension, $this->allowed_ext)) {
+        if (!in_array($extension, $this->allowed_ext)) {
             return false;
         }
 
