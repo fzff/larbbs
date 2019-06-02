@@ -21,7 +21,7 @@ $api = app('Dingo\Api\Routing\Router');
 
 $api->version('v1', [
     'namespace' => 'App\Http\Controllers\Api',
-    'middleware' => 'serializer:array'
+    'middleware' => ['serializer:array', 'bindings']
 ], function ($api) {
     $api->group([
         'middleware' => 'api.throttle',
@@ -54,6 +54,10 @@ $api->version('v1', [
         $api->delete('authorizations/current', 'AuthorizationsController@destroy')
             ->name('api.authorizations.destroy');
 
+        // 游客可以访问的接口
+        $api->get('categories', 'CategoriesController@index')
+            ->name('api.categories.index');
+
         // 需要 token 验证的接口
         $api->group(['middleware' => 'api.auth'], function($api) {
             //获取用户单条信息
@@ -64,6 +68,12 @@ $api->version('v1', [
 
             // 编辑登录用户信息
             $api->patch('user', 'UsersController@update')->name('api.user.update');
+
+            // 发布话题
+            $api->post('topics', 'TopicsController@store')->name('api.topics.store');
+
+            //修改话题
+            $api->patch('topics/{topic}', 'TopicsController@update')->name('api.topics.update');
         });
     });
 });
