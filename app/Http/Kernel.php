@@ -58,7 +58,7 @@ class Kernel extends HttpKernel
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
 
             // 强制用户邮箱认证
-            \App\Http\Middleware\EnsureEmailIsVerified::class,
+            //\App\Http\Middleware\EnsureEmailIsVerified::class,
 
             // 记录用户最后活跃时间
             \App\Http\Middleware\RecordLastActivedTime::class,
