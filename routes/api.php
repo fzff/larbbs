@@ -58,6 +58,9 @@ $api->version('v1', [
         $api->get('categories', 'CategoriesController@index')->name('api.categories.index');
         $api->get('topics', 'TopicsController@index')->name('api.topics.index');
         $api->get('users/{user}/topics', 'TopicsController@userIndex')->name('api.users.topics.index');
+        $api->get('topics/{topic}', 'TopicsController@show')->name('api.topics.show');
+        $api->get('topics/{topic}/replies', 'RepliesController@index')->name('api.topics.replies.index');
+        $api->get('users/{user}/replies', 'RepliesController@userIndex')->name('api.users.replies.index');
 
         // 需要 token 验证的接口
         $api->group(['middleware' => 'api.auth'], function($api) {
@@ -78,14 +81,24 @@ $api->version('v1', [
 
             //删除话题
             $api->delete('topics/{topic}', 'TopicsController@destroy')->name('api.topics.destroy');
+
+            // 发布回复
+            $api->post('topics/{topic}/replies', 'RepliesController@store')->name('api.topics.replies.store');
+
+            // 删除回复
+            $api->delete('topics/{topic}/replies/{reply}', 'RepliesController@destroy')->name('api.topics.replies.destroy');
+
+            // 通知列表
+            $api->get('user/notifications', 'NotificationsController@index')->name('api.user.notifications.index');
+
+            // 通知统计
+            $api->get('user/notifications/stats', 'NotificationsController@stats')->name('api.user.notifications.stats');
+
+            // 标记消息通知为已读
+            $api->patch('user/read/notifications', 'NotificationsController@read')->name('api.user.notifications.read');
+
+            // 当前登录用户权限
+            $api->get('user/permissions', 'PermissionsController@index')->name('api.user.permissions.index');
         });
     });
 });
-
-//071LJZQz1vPKkc0jJcNz1nC9Rz1LJZQc
-
-//https://api.weixin.qq.com/sns/oauth2/access_token?appid=wx733895b6cd4a1273&secret=2937df6ce5a310da45814d5f83b6ca01&code=071LJZQz1vPKkc0jJcNz1nC9Rz1LJZQc&grant_type=authorization_code
-//https://api.weixin.qq.com/sns/userinfo?access_token=22_f4eWQvPlVCv_aGXPiQYq_RliJfaUiOrRceofiKiHKJw41KJgGb-0qjTFYzZJa37ZVB6X-cqpNywzYUnBFGpdaQ&openid=o5Sm91WO1zTnvHTdNFzHgsw4J9uU&lang=zh_CN
-
-//22_f4eWQvPlVCv_aGXPiQYq_RliJfaUiOrRceofiKiHKJw41KJgGb-0qjTFYzZJa37ZVB6X-cqpNywzYUnBFGpdaQ
-//open_id = o5Sm91WO1zTnvHTdNFzHgsw4J9uU

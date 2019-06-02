@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
+use Auth;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Auth\MustVerifyEmail as MustVerifyEmailTrait;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Contracts\Auth\MustVerifyEmail as MustVerifyEmailContract;
-use Auth;
 use Spatie\Permission\Traits\HasRoles;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
@@ -20,6 +20,7 @@ class User extends Authenticatable implements MustVerifyEmailContract, JWTSubjec
     use Notifiable {
         notify as protected laravelNotify;
     }
+
     public function notify($instance)
     {
         // 如果要通知的人是当前用户，就不必通知了！
@@ -32,7 +33,7 @@ class User extends Authenticatable implements MustVerifyEmailContract, JWTSubjec
             $this->increment('notification_count');
         }
 
-        $this->laravelNotify($instance);
+        //$this->laravelNotify($instance);
     }
 
     protected $fillable = [
@@ -72,6 +73,7 @@ class User extends Authenticatable implements MustVerifyEmailContract, JWTSubjec
     {
         $this->notification_count = 0;
         $this->save();
+
         $this->unreadNotifications->markAsRead();
     }
 

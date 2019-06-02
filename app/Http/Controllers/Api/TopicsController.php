@@ -10,6 +10,13 @@ use Illuminate\Http\Request;
 
 class TopicsController extends Controller
 {
+    /**
+     * topics index
+     *
+     * @param Request $request
+     * @param Topic $topic
+     * @return \Dingo\Api\Http\Response
+     */
     public function index(Request $request, Topic $topic)
     {
         $query = $topic->query();
@@ -32,6 +39,13 @@ class TopicsController extends Controller
         return $this->response->paginator($topics, new TopicTransformer());
     }
 
+    /**
+     * topics index from user
+     *
+     * @param User $user
+     * @param Request $request
+     * @return \Dingo\Api\Http\Response
+     */
     public function userIndex(User $user, Request $request)
     {
         $topics = $user->topics()->recent()->paginate(20);
@@ -39,6 +53,13 @@ class TopicsController extends Controller
         return $this->response->paginator($topics, new TopicTransformer());
     }
 
+    /**
+     * create new topics
+     *
+     * @param TopicRequest $request
+     * @param Topic $topic
+     * @return \Dingo\Api\Http\Response
+     */
     public function store(TopicRequest $request, Topic $topic)
     {
         $topic->fill($request->all());
@@ -49,6 +70,14 @@ class TopicsController extends Controller
             ->setStatusCode(201);
     }
 
+    /**
+     * update topics
+     *
+     * @param TopicRequest $request
+     * @param Topic $topic
+     * @return \Dingo\Api\Http\Response
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
     public function update(TopicRequest $request, Topic $topic)
     {
         $this->authorize('update', $topic);
@@ -58,6 +87,13 @@ class TopicsController extends Controller
         return $this->response->item($topic, new TopicTransformer());
     }
 
+    /**
+     * delete topics
+     *
+     * @param Topic $topic
+     * @return \Dingo\Api\Http\Response
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
     public function destroy(Topic $topic)
     {
         $this->authorize('destroy', $topic);
@@ -65,5 +101,16 @@ class TopicsController extends Controller
         $topic->delete();
 
         return $this->response->noContent();
+    }
+
+    /**
+     * show topics detail
+     *
+     * @param Topic $topic
+     * @return \Dingo\Api\Http\Response
+     */
+    public function show(Topic $topic)
+    {
+        return $this->response->item($topic, new TopicTransformer());
     }
 }
