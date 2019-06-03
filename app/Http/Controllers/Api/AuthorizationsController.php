@@ -3,12 +3,19 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\User;
+use App\Traits\PassportToken;
 use Illuminate\Http\Request;
 use App\Http\Requests\Api\AuthorizationRequest;
 use App\Http\Requests\Api\SocialAuthorizationRequest;
+use League\OAuth2\Server\AuthorizationServer;
+use League\OAuth2\Server\Exception\OAuthServerException;
+use Psr\Http\Message\ServerRequestInterface;
+use Zend\Diactoros\Response;
 
 class AuthorizationsController extends Controller
 {
+    use PassportToken;
+
     public function socialStore($type, SocialAuthorizationRequest $request)
     {
         if (!in_array($type, ['weixin'])) {
@@ -31,7 +38,8 @@ class AuthorizationsController extends Controller
 
             $oauthUser = $driver->userFromToken($token);
         } catch (\Exception $exception) {
-            return $this->response->errorUnauthorized('参数错误，未获取用户信息');
+            //return $this->response->errorUnauthorized('参数错误，未获取用户信息');
+            return $this->response->errorUnauthorized($exception->getMessage());
         }
 
         switch ($type) {
@@ -56,30 +64,29 @@ class AuthorizationsController extends Controller
                 break;
         }
 
-        return $this->respondWithToken($token);
+        $result = $this->getBearerTokenByUser($user, 1, false);
+
+        return $this->response->array($result)->setStatusCode(201);
     }
 
-    public function store(AuthorizationRequest $request)
+    public function store(AuthorizationRequest $request, AuthorizationServer $authorizationServer,
+                          ServerRequestInterface $serverRequest)
     {
-        $username = $request->username;
-
-        filter_var($username, FILTER_VALIDATE_EMAIL) ?
-            $credentials['email'] = $username :
-            $credentials['phone'] = $username;
-
-        $credentials['password'] = $request->password;
-
-        if (!$token = \Auth::guard('api')->attempt($credentials)) {
-            return $this->response->errorUnauthorized('用户名或密码错误');
+        try {
+            return $authorizationServer->respondToAccessTokenRequest($serverRequest, new Response)
+                ->withStatus(201);
+        } catch (OAuthServerException $exception) {
+            return $this->response->errorUnauthorized($exception->getMessage());
         }
-
-        return $this->respondWithToken($token);
     }
 
-    public function update()
+    public function update(AuthorizationServer $authorizationServer, ServerRequestInterface $serverRequest)
     {
-        $token = \Auth::guard('api')->refresh();
-        return $this->respondWithToken($token);
+        try {
+            return $authorizationServer->respondToAccessTokenRequest($serverRequest, new Response);
+        } catch (OAuthServerException $exception) {
+            return $this->response->errorUnauthorized($exception->getMessage());
+        }
     }
 
     public function destroy()
