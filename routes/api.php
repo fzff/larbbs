@@ -29,14 +29,18 @@ $api->version('v1', [
         'expires' => config('api.rate_limits.sign.expires'),
     ], function ($api) {
         // 短信验证码
-        $api->post('verificationCodes', 'VerificationCodesController@store')->name('api.verificationCodes.store');
+        $api->post('verificationCodes', 'VerificationCodesController@store')
+            ->name('api.verificationCodes.store');
 
         // 用户注册
-        $api->post('users', 'UsersController@store')->name('api.users.store');
+        $api->post('users', 'UsersController@store')
+            ->name('api.users.store');
 
         // 图片验证码
-        $api->post('captchas', 'CaptchasController@store')->name('api.captchas.store');
-        $api->get('get-captcha', 'CaptchasController@getCaptchasImage')->name('api.get-captcha.getCaptchasImage');
+        $api->post('captchas', 'CaptchasController@store')
+            ->name('api.captchas.store');
+        $api->get('get-captcha', 'CaptchasController@getCaptchasImage')
+            ->name('api.get-captcha.getCaptchasImage');
 
         // 第三方登录
         $api->post('socials/{social_type}/authorizations', 'AuthorizationsController@socialStore')
@@ -45,6 +49,10 @@ $api->version('v1', [
         // 登录
         $api->post('authorizations', 'AuthorizationsController@store')
             ->name('api.authorizations.store');
+
+        // 小程序登录
+        $api->post('weapp/authorizations', 'AuthorizationsController@weappStore')
+            ->name('api.weapp.authorizations.store');
 
         // 刷新token
         $api->put('authorizations/current', 'AuthorizationsController@update')
