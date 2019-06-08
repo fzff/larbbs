@@ -16,7 +16,7 @@ class ReplyTransformer extends TransformerAbstract
             'id' => $reply->id,
             'user_id' => (int) $reply->user_id,
             'topic_id' => (int) $reply->topic_id,
-            'content' => $reply->content,
+            'content' => strip_tags($reply->content),
             'created_at' => (string) $reply->created_at,
             'updated_at' => (string) $reply->updated_at,
         ];

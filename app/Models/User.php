@@ -23,9 +23,16 @@ class User extends Authenticatable implements MustVerifyEmailContract, JWTSubjec
         notify as protected laravelNotify;
     }
 
+    protected $fillable = [
+        'name', 'phone', 'email', 'password', 'introduction', 'avatar', 'weixin_openid', 'weixin_unionid'
+    ];
+
+    protected $hidden = [
+        'password', 'remember_token',
+    ];
+
     public function notify($instance)
     {
-        // 如果要通知的人是当前用户，就不必通知了！
         if ($this->id == Auth::id()) {
             return;
         }
@@ -37,14 +44,6 @@ class User extends Authenticatable implements MustVerifyEmailContract, JWTSubjec
 
         //$this->laravelNotify($instance);
     }
-
-    protected $fillable = [
-        'name', 'phone', 'email', 'password', 'introduction', 'avatar', 'weixin_openid', 'weixin_unionid'
-    ];
-
-    protected $hidden = [
-        'password', 'remember_token',
-    ];
 
     public function getJWTIdentifier()
     {

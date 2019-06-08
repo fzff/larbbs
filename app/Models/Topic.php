@@ -13,6 +13,11 @@ class Topic extends Model
         return $this->hasMany(Reply::class);
     }
 
+    public function topReplies($limit = 5)
+    {
+        return $this->replies()->limit($limit);
+    }
+
     public function category()
     {
         return $this->belongsTo(Category::class);

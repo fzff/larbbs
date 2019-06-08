@@ -7,7 +7,6 @@ use App\Http\Requests\Api\ImageRequest;
 use App\Models\Image;
 use App\Transformers\ImageTransformer;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 
 class ImagesController extends Controller
 {

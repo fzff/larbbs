@@ -61,7 +61,7 @@ class RepliesController extends Controller
             return $this->response->errorBadRequest();
         }
 
-        $this->authorize('destroy', $reply);
+        //$this->authorize('destroy', $reply);
         $reply->delete();
 
         return $this->response->noContent();

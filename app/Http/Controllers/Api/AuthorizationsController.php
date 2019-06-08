@@ -8,6 +8,7 @@ use App\Traits\PassportToken;
 use Illuminate\Http\Request;
 use App\Http\Requests\Api\AuthorizationRequest;
 use App\Http\Requests\Api\SocialAuthorizationRequest;
+use Illuminate\Support\Facades\Auth;
 use League\OAuth2\Server\AuthorizationServer;
 use League\OAuth2\Server\Exception\OAuthServerException;
 use Psr\Http\Message\ServerRequestInterface;
@@ -17,6 +18,12 @@ class AuthorizationsController extends Controller
 {
     use PassportToken;
 
+    /**
+     * third-party login
+     *
+     * @param $type
+     * @param SocialAuthorizationRequest $request
+     */
     public function socialStore($type, SocialAuthorizationRequest $request)
     {
         if (!in_array($type, ['weixin'])) {
@@ -70,6 +77,14 @@ class AuthorizationsController extends Controller
         return $this->response->array($result)->setStatusCode(201);
     }
 
+    /**
+     * ordinary login
+     *
+     * @param AuthorizationRequest $request
+     * @param AuthorizationServer $authorizationServer
+     * @param ServerRequestInterface $serverRequest
+     * @return \Psr\Http\Message\ResponseInterface|void
+     */
     public function store(AuthorizationRequest $request, AuthorizationServer $authorizationServer, ServerRequestInterface $serverRequest)
     {
         try {
@@ -80,6 +95,13 @@ class AuthorizationsController extends Controller
         }
     }
 
+    /**
+     * update token
+     *
+     * @param AuthorizationServer $authorizationServer
+     * @param ServerRequestInterface $serverRequest
+     * @return \Psr\Http\Message\ResponseInterface|void
+     */
     public function update(AuthorizationServer $authorizationServer, ServerRequestInterface $serverRequest)
     {
         try {
@@ -89,6 +111,11 @@ class AuthorizationsController extends Controller
         }
     }
 
+    /**
+     * logout login
+     *
+     * @return \Dingo\Api\Http\Response
+     */
     public function destroy()
     {
         \Auth::guard('api')->logout();
@@ -96,7 +123,7 @@ class AuthorizationsController extends Controller
     }
 
     /**
-     * min programing login
+     * min procedure login
      *
      * @param WeappAuthorizationRequest $request
      */
@@ -107,17 +134,6 @@ class AuthorizationsController extends Controller
         // 根据 code 获取微信 openid 和 session_key
         $miniProgram = \EasyWeChat::miniProgram();
         $data = $miniProgram->auth->session($code);
-
-        //todo 测试
-        $credentials['email']= 1312;
-        $credentials['password'] = 123123;
-
-        // 验证用户名和密码是否正确
-        if (!\Auth::guard('api')->once($credentials)) {
-            return $this->response->errorUnauthorized('用户名或密码错误');
-        }
-
-        exit;
 
         // 如果结果错误，说明 code 已过期或不正确，返回 401 错误
         if (isset($data['errcode'])) {
@@ -146,12 +162,12 @@ class AuthorizationsController extends Controller
             $credentials['password'] = $request->password;
 
             // 验证用户名和密码是否正确
-            if (!\Auth::guard('api')->once($credentials)) {
+            if (!Auth::guard('api')->once($credentials)) {
                 return $this->response->errorUnauthorized('用户名或密码错误');
             }
 
             // 获取对应的用户
-            $user = \Auth::guard('api')->getUser();
+            $user = Auth::guard('api')->getUser();
             $attributes['weapp_openid'] = $data['openid'];
         }
 
@@ -159,7 +175,7 @@ class AuthorizationsController extends Controller
         $user->update($attributes);
 
         // 为对应用户创建 JWT
-        $token = \Auth::guard('api')->fromUser($user);
+        $token = Auth::guard('api')->fromUser($user);
 
         return $this->respondWithToken($token)->setStatusCode(201);
     }

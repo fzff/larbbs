@@ -18,6 +18,7 @@ class UserRequest extends FormRequest
                 ];
                 break;
             case 'PATCH':
+            case 'PUT':
                 $userId = \Auth::guard('api')->id();
 
                 return [

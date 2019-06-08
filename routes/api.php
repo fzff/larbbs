@@ -54,13 +54,9 @@ $api->version('v1', [
         $api->post('weapp/authorizations', 'AuthorizationsController@weappStore')
             ->name('api.weapp.authorizations.store');
 
-        // 刷新token
-        $api->put('authorizations/current', 'AuthorizationsController@update')
-            ->name('api.authorizations.update');
-
-        // 删除token
-        $api->delete('authorizations/current', 'AuthorizationsController@destroy')
-            ->name('api.authorizations.destroy');
+        // 小程序注册
+        $api->post('weapp/users', 'UsersController@weappStore')
+            ->name('api.weapp.users.store');
 
         // todo 游客可以访问的接口
         $api->get('categories', 'CategoriesController@index')->name('api.categories.index');
@@ -72,8 +68,20 @@ $api->version('v1', [
         $api->get('links', 'LinksController@index')->name('api.links.index');
         $api->get('actived/users', 'UsersController@activedIndex')->name('api.actived.users.index');
 
+        // 小程序用户详情sda
+        $api->get('users/{user}', 'UsersController@show')->name('api.users.show');
+
         // 需要 token 验证的接口
         $api->group(['middleware' => 'api.auth'], function($api) {
+
+            // 刷新token
+            $api->put('authorizations/current', 'AuthorizationsController@update')
+                ->name('api.authorizations.update');
+
+            // 删除token
+            $api->delete('authorizations/current', 'AuthorizationsController@destroy')
+                ->name('api.authorizations.destroy');
+
             //获取用户单条信息
             $api->get('user', 'UsersController@me')->name('api.user.show');
 
@@ -106,9 +114,14 @@ $api->version('v1', [
 
             // 标记消息通知为已读
             $api->patch('user/read/notifications', 'NotificationsController@read')->name('api.user.notifications.read');
+            $api->put('user/read/notifications', 'NotificationsController@read')->name('api.user.notifications.read.put');
 
             // 当前登录用户权限
             $api->get('user/permissions', 'PermissionsController@index')->name('api.user.permissions.index');
+
+            // 编辑小程序登录用户信息
+            $api->patch('user', 'UsersController@update')->name('api.user.patch');
+            $api->put('user', 'UsersController@update')->name('api.user.update');
         });
     });
 });
